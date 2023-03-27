@@ -31,6 +31,7 @@ const crearUsuario = async (req, res = response) => {
       ok: true,
       uid: dbUser.id,
       name,
+      email,
       token,
       message: 'Usuario creado',
     });
@@ -75,6 +76,7 @@ const login = async (req, res) => {
       ok: true,
       uid: dbUser.id,
       name: dbUser.name,
+      email: dbUser.email,
       token,
       message: 'Login correcto',
     });
@@ -90,15 +92,18 @@ const login = async (req, res) => {
 
 const revalidarToken = async (req, res) => {
 
-  const { uid, name } = req;
+  const { uid } = req;
 
-  const token = await generarJWT(uid, name);
+  const dbUser = await Usuario.findById(uid);
+
+  const token = await generarJWT(uid, dbUser.name);
 
   return res.status(200).json({
     ok: true,
     message: 'Renew',
     token,
-    name,
+    name: dbUser.name,
+    email: dbUser.email,
     uid,
   });
 }
